@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/IUPAC.iml" filepath="$PROJECT_DIR$/.idea/IUPAC.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Perovskite/.idea/Perovskite.iml" filepath="$PROJECT_DIR$/../Perovskite/.idea/Perovskite.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Perovskiticity/.idea/Perovskiticity.iml" filepath="$PROJECT_DIR$/../Perovskiticity/.idea/Perovskiticity.iml" />
+    </modules>
+  </component>
+</project>
