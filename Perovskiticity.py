@@ -416,8 +416,8 @@ class Perovskite:
         self.coordination_numbers = []
         self.non_octahedral = False
         for polyhedron in self.polyhedra:
-            if (len(polyhedron) - 1) not in self.coordination_numbers:
-                self.coordination_numbers.append(len(polyhedron) - 1)
+            if str(len(polyhedron) - 1) not in self.coordination_numbers:
+                self.coordination_numbers.append(str(len(polyhedron) - 1))
             if len(polyhedron) > 7 or len(polyhedron) <7:
                 self.non_octahedral = True
 
@@ -968,8 +968,7 @@ def execute_search(metals = 'Group14'):
     print(len(hits))
     return hits
 
-
-def export_data2(hitlist, databasepath, reload=False, images=False):
+def export_data(hitlist, databasepath, reload=False, images=False):
     global_start_time = time.perf_counter()
     describe_structure_time = None
     timedict = {'reading':0, 'sanitize_name':0, 'pymatgenize':0, 'find_metal_oxidation_states': 0, 'Perovskite':0,
@@ -1165,7 +1164,7 @@ def export_data2(hitlist, databasepath, reload=False, images=False):
                         adjacency = numpy.round(hit_perovskite.adjacency, decimals=4)
                     b_cations = hit_perovskite.b
                     x_anions = hit_perovskite.x
-                    coordination_numbers = hit_perovskite.coordination_numbers
+                    coordination_numbers = hit_perovskite.coordination_numbers.sort(reverse=True)
                     if hit_perovskite.cpp:
                         cpp = numpy.round(hit_perovskite.cpp, decimals=4)
                     else:
