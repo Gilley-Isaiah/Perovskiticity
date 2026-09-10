@@ -49,15 +49,43 @@ jmol_radii =   {'Ac': 1.88, 'Ag': 1.59, 'Al': 1.35, 'Am': 1.51, 'Ar': 1.57, 'As'
                 'Tl': 1.55, 'Tm': 1.72, 'U': 1.58, 'V': 1.33, 'W': 1.37, 'Xe': 1.98, 'Y': 1.78, 'Yb': 1.94, 'Zn': 1.45,
                 'Zr': 1.56}
 
+jmol_radii_ionic = {'H-': 1.54, 'Li+': 0.68, 'Be+': 0.44, 'Be2+': 0.35, 'B+': 0.35, 'B3+': 0.23, 'C4-': 2.6, 'C4+': 0.16,
+                    'N3-': 1.71, 'N+': 0.25, 'N3+': 0.16, 'N5+': 0.13, 'O2-': 1.32, 'O-': 1.76, 'O+': 0.22, 'O6+': 0.09,
+                    'F-': 1.33, 'F7+': 0.08, 'Ne+': 1.12, 'Na+': 0.97, 'Mg+': 0.82, 'Mg2+': 0.66, 'Al3+': 0.51,
+                    'Si4-': 2.71, 'Si-': 3.84, 'Si+': 0.65, 'Si4+': 0.42, 'P3-': 2.12, 'P3+': 0.44, 'P5+': 0.35,
+                    'S2-': 1.84, 'S2+': 2.19, 'S4+': 0.37, 'S6+': 0.3, 'Cl-': 1.81, 'Cl5+': 0.34, 'Cl7+': 0.27,
+                    'Ar+': 1.54, 'K+': 1.33, 'Ca+': 1.18, 'Ca2+': 0.99, 'Sc3+': 0.732, 'Ti+': 0.96, 'Ti2+': 0.94,
+                    'Ti3+': 0.76, 'Ti4+': 0.68, 'V2+': 0.88, 'V3+': 0.74, 'V4+': 0.63, 'V5+': 0.59, 'Cr+': 0.81,
+                    'Cr2+': 0.89, 'Cr3+': 0.63, 'Cr6+': 0.52, 'Mn2+': 0.8, 'Mn3+': 0.66, 'Mn4+': 0.6, 'Mn7+': 0.46,
+                    'Fe2+': 0.74, 'Fe3+': 0.64, 'Co2+': 0.72, 'Co3+': 0.63, 'Ni2+': 0.69, 'Cu+': 0.96, 'Cu2+': 0.72,
+                    'Zn+': 0.88, 'Zn2+': 0.74, 'Ga+': 0.81, 'Ga3+': 0.62, 'Ge4-': 2.72, 'Ge2+': 0.73, 'Ge4+': 0.53,
+                    'As3-': 2.22, 'As3+': 0.58, 'As5+': 0.46, 'Se2-': 1.91, 'Se-': 2.32, 'Se+': 0.66, 'Se4+': 0.5,
+                    'Se6+': 0.42, 'Br-': 1.96, 'Br5+': 0.47, 'Br7+': 0.39, 'Rb+': 1.47, 'Sr2+': 1.12, 'Y3+': 0.893,
+                    'Zr+': 1.09, 'Zr4+': 0.79, 'Nb+': 1.0, 'Nb4+': 0.74, 'Nb5+': 0.69, 'Mo+': 0.93, 'Mo4+': 0.7,
+                    'Mo6+': 0.62, 'Tc7+': 0.979, 'Ru4+': 0.67, 'Rh3+': 0.68, 'Pd2+': 0.8, 'Pd4+': 0.65, 'Ag+': 1.26,
+                    'Ag2+': 0.89, 'Cd+': 1.14, 'Cd2+': 0.97, 'In3+': 0.81, 'Sn4-': 2.94, 'Sn-': 3.7, 'Sn2+': 0.93,
+                    'Sn4+': 0.71, 'Sb3-': 2.45, 'Sb3+': 0.76, 'Sb5+': 0.62, 'Te2-': 2.11, 'Te-': 2.5, 'Te+': 0.82,
+                    'Te4+': 0.7, 'Te6+': 0.56, 'I-': 2.2, 'I5+': 0.62, 'I7+': 0.5, 'Cs+': 1.67, 'Ba+': 1.53,
+                    'Ba2+': 1.34, 'La+': 1.39, 'La3+': 1.016, 'Ce+': 1.27, 'Ce3+': 1.034, 'Ce4+': 0.92, 'Pr3+': 1.013,
+                    'Pr4+': 0.9, 'Nd3+': 0.995, 'Pm3+': 0.979, 'Sm3+': 0.964, 'Eu2+': 1.09, 'Eu3+': 0.95, 'Gd3+': 0.938,
+                    'Tb3+': 0.923, 'Tb4+': 0.84, 'Dy3+': 0.908, 'Ho3+': 0.894, 'Er3+': 0.881, 'Tm3+': 0.87, 'Yb2+': 0.93,
+                    'Yb3+': 0.858, 'Lu3+': 0.85, 'Hf4+': 0.78, 'Ta5+': 0.68, 'W4+': 0.7, 'W6+': 0.62, 'Re4+': 0.72,
+                    'Re7+': 0.56, 'Os4+': 0.88, 'Os6+': 0.69, 'Ir4+': 0.68, 'Pt2+': 0.8, 'Pt4+': 0.65, 'Au+': 1.37,
+                    'Au3+': 0.85, 'Hg+': 1.27, 'Hg2+': 1.1, 'Tl+': 1.47, 'Tl3+': 0.95, 'Pb2+': 1.2, 'Pb4+': 0.84,
+                    'Bi+': 0.98, 'Bi3+': 0.96, 'Bi5+': 0.74, 'Po6+': 0.67, 'At7+': 0.62, 'Fr+': 1.8, 'Ra2+': 1.43,
+                    'Ac3+': 1.18, 'Th4+': 1.02, 'Pa3+': 1.13, 'Pa4+': 0.98, 'Pa5+': 0.89, 'U4+': 0.97, 'U6+': 0.8,
+                    'Np3+': 1.1, 'Np4+': 0.95, 'Np7+': 0.71, 'Pu3+': 1.08, 'Pu4+': 0.93, 'Am3+': 1.07, 'Am4+': 0.92}
+
+
 # Special exceptions to jmol_radii
 bond_lengths =         {'Ge': 3.44, 'Sn': 3.44, 'Pb': 3.05,
                         'Ag': 2.90, 'In': 2.62, 'Tl': 3.51, 'As': 2.34, 'Sb': 2.57, 'Bi': 2.91,
-                        'F': 1.25, 'Cl': 1.25, 'Br': 1.25, 'I': 1.25}
+                        'F': 0.5, 'Cl': 0.8, 'Br': 0.95, 'I': 1.25}
 
 # Assumption: Pb, Ag, In, Tl will never be outside of their usual oxidation state (+2, +1, +3, +1, respectively)
-bond_lengths_oxidized = {'Ge': 1.5, 'Sn': 1.65, 'Pb':3.05,
+bond_lengths_oxidized = {'Ge': 1.5, 'Sn': 1.85, 'Pb':3.05,
                          'Ag': 2.90, 'In':2.62, 'Tl':3.51, 'As':1.65, 'Sb':1.65, 'Bi':1.75,
-                         'F':1.25, 'Cl':1.25, 'Br':1.25, 'I':1.25}
+                         'F':0.5, 'Cl':0.8, 'Br':0.95, 'I':1.25}
 
 
 def find_metal_oxidation_states(hit):
@@ -68,52 +96,56 @@ def find_metal_oxidation_states(hit):
     :param hit: A hit object from a CCDC Python API search.
     :return: An averaged 'metal charge' for the metals in the structure.
     """
-    crystal = hit.entry.crystal
-    # Hydrogens are removed to save time
-    crystal.remove_hydrogens()
-    total_inorganic_charge = 0
-    inorganic_atoms_dict = {}
-    for component in crystal.molecule.components:
-        component_contains_metal = False
-        for atom in component.atoms:
-            if atom.is_metal:
-                component_contains_metal = True
-                break
-        if component_contains_metal:
-            formal_charge = component.formal_charge
-            total_inorganic_charge += formal_charge
+    override_dict = {'WEBBAI': 4}
+    if hit.identifier in override_dict:
+        metal_charge = override_dict[hit.identifier]
+    else:
+        crystal = hit.entry.crystal
+        # Hydrogens are removed to save time
+        crystal.remove_hydrogens()
+        total_inorganic_charge = 0
+        inorganic_atoms_dict = {}
+        for component in crystal.molecule.components:
+            component_contains_metal = False
+            for atom in component.atoms:
+                if atom.is_metal:
+                    component_contains_metal = True
+                    break
+            if component_contains_metal:
+                formal_charge = component.formal_charge
+                total_inorganic_charge += formal_charge
 
-            for word in component.formula.split(" "):
-                elementsymbol = ""
-                elementcount = ""
-                wordstarted = False
-                wordfinished = False
-                for letter in word:
-                    if letter.isalpha():
-                        if not wordfinished:
-                            elementsymbol += letter
-                            wordstarted = True
-                    elif letter.isdigit() or letter == ".":
-                        wordfinished = True
-                        if wordstarted:
-                            elementcount += letter
-                    else:
-                        continue
-                if elementcount:
-                    if elementsymbol not in inorganic_atoms_dict:
-                        inorganic_atoms_dict.update({elementsymbol: int(elementcount)})
-                    else:
-                        inorganic_atoms_dict.update({elementsymbol: inorganic_atoms_dict[elementsymbol] + int(elementcount)})
+                for word in component.formula.split(" "):
+                    elementsymbol = ""
+                    elementcount = ""
+                    wordstarted = False
+                    wordfinished = False
+                    for letter in word:
+                        if letter.isalpha():
+                            if not wordfinished:
+                                elementsymbol += letter
+                                wordstarted = True
+                        elif letter.isdigit() or letter == ".":
+                            wordfinished = True
+                            if wordstarted:
+                                elementcount += letter
+                        else:
+                            continue
+                    if elementcount:
+                        if elementsymbol not in inorganic_atoms_dict:
+                            inorganic_atoms_dict.update({elementsymbol: int(elementcount)})
+                        else:
+                            inorganic_atoms_dict.update({elementsymbol: inorganic_atoms_dict[elementsymbol] + int(elementcount)})
 
-    # Halides and metals are treated specially here. Halides are considered to always have -1 charge.
-    metal_count = 0
-    halide_count = 0
-    for species in inorganic_atoms_dict:
-        if species in ['F', 'Cl', 'Br', 'I']:
-            halide_count += inorganic_atoms_dict[species]
-        if species in ['Ge', 'Sn', 'Pb', 'Ag', 'In', 'Tl', 'As', 'Sb', 'Bi']:
-            metal_count += inorganic_atoms_dict[species]
-    metal_charge = (halide_count + total_inorganic_charge) / metal_count
+        # Halides and metals are treated specially here. Halides are considered to always have -1 charge.
+        metal_count = 0
+        halide_count = 0
+        for species in inorganic_atoms_dict:
+            if species in ['F', 'Cl', 'Br', 'I']:
+                halide_count += inorganic_atoms_dict[species]
+            if species in ['Ge', 'Sn', 'Pb', 'Ag', 'In', 'Tl', 'As', 'Sb', 'Bi']:
+                metal_count += inorganic_atoms_dict[species]
+        metal_charge = (halide_count + total_inorganic_charge) / metal_count
 
     return metal_charge
 
@@ -374,7 +406,14 @@ class Perovskite:
             atomic_radii_updates = bond_lengths_oxidized
         else:
             atomic_radii_updates = bond_lengths
-        preferred_radii = jmol_radii | atomic_radii_updates
+        if all("+" in metal for metal in b):
+            ionic_radii = True
+        else:
+            ionic_radii = False
+        if ionic_radii:
+            preferred_radii = jmol_radii_ionic
+        else:
+            preferred_radii = jmol_radii | atomic_radii_updates
 
         # This block uses the preferred radii to generate an assumed maximum radius for the structure
         blist = []
@@ -383,7 +422,10 @@ class Perovskite:
             blist.append(preferred_radii[metal])
         for anion in x:
             xlist.append(preferred_radii[anion])
-        self.structure_radius = max(blist) + max(xlist)
+        if ionic_radii:
+            self.structure_radius = (max(blist) + max(xlist)) * 1.2
+        elif not ionic_radii:
+            self.structure_radius = max(blist) + max(xlist)
 
         # We begin by appending the coordinates of each B cation to the polyhedra list.
         polyhedra_ct = 0
@@ -414,12 +456,16 @@ class Perovskite:
         # If any are not exactly 6, we mark the structure as 'non-octahedral'
         # Note that 'polyhedron' lists contain metals, so we subtract 1 to get the metal's coordination number
         self.coordination_numbers = []
+        dummy_numbers_list = []
         self.non_octahedral = False
         for polyhedron in self.polyhedra:
-            if str(len(polyhedron) - 1) not in self.coordination_numbers:
-                self.coordination_numbers.append(str(len(polyhedron) - 1))
+            if (len(polyhedron) - 1) not in dummy_numbers_list:
+                dummy_numbers_list.append(len(polyhedron) - 1)
             if len(polyhedron) > 7 or len(polyhedron) <7:
                 self.non_octahedral = True
+        dummy_numbers_list.sort(reverse=True)
+        for number in dummy_numbers_list:
+            self.coordination_numbers.append(str(number))
 
 
 
@@ -427,29 +473,32 @@ class Perovskite:
         # multiple differently charged cations.
         charges =          {'Pb':2, 'Sn':2, 'Ge':2, 'As':3, 'Sb':3, 'Bi':3, 'Ag':1, 'In':3, 'Tl':1}
         oxidized_charges = {'Pb':2, 'Sn':4, 'Ge':4, 'As':5, 'Sb':5, 'Bi':5, 'Ag':1, 'In':3, 'Tl':1}
-        if oxidized_metal:
-            structurecharges = {oxidized_charges[x] for x in self.b}
-        else:
-            structurecharges = {charges[x] for x in self.b}
-        bcationcharge = None
-        if len(structurecharges) == 1:
-            bcationcharge = list(structurecharges)[0]
-        if bcationcharge:
-            vertlist = list()
-            for polyhedron in frac_polyhedra:
-                for vert in polyhedron[1:]:
-                    if not all([0 <= site < 1 for site in vert]):
-                        for idx, site in enumerate(vert):
-                            if site < 0:
-                                vert[idx] += 1
-                            if site >= 1:
-                                vert[idx] -= 1
-                    vertlist.append(numpy.round(vert, 7))
-            vertlist = numpy.unique(vertlist, axis=0)
-            npolyhedra = len(polyhedra)
-            poscharge = npolyhedra * bcationcharge
-            negcharge = len(vertlist)
-            self.cpp = (poscharge - negcharge) / npolyhedra
+        try:
+            if oxidized_metal:
+                structurecharges = {oxidized_charges[x] for x in self.b}
+            else:
+                structurecharges = {charges[x] for x in self.b}
+            bcationcharge = None
+            if len(structurecharges) == 1:
+                bcationcharge = list(structurecharges)[0]
+            if bcationcharge:
+                vertlist = list()
+                for polyhedron in frac_polyhedra:
+                    for vert in polyhedron[1:]:
+                        if not all([0 <= site < 1 for site in vert]):
+                            for idx, site in enumerate(vert):
+                                if site < 0:
+                                    vert[idx] += 1
+                                if site >= 1:
+                                    vert[idx] -= 1
+                        vertlist.append(numpy.round(vert, 7))
+                vertlist = numpy.unique(vertlist, axis=0)
+                npolyhedra = len(polyhedra)
+                poscharge = npolyhedra * bcationcharge
+                negcharge = len(vertlist)
+                self.cpp = (poscharge - negcharge) / npolyhedra
+        except KeyError:
+            self.cpp = None
 
     def connectivity(self):
         """The connectivity() function calculates a set of indices describing the amount and type of polyhedral
@@ -633,17 +682,17 @@ class Perovskite:
 
                 # Calculate the interior (edge) angles from the list of edges. This is done by drawing vectors
                 # from the center to either vertex of the edge and calculating the angle between the vectors.
-                polyngles = []
+                polyangles = []
                 for edge in edgepairs:
                     edge.append(polyhedron[0])
                     u = edge[0] - edge[2]
                     v = edge[1] - edge[2]
                     angle_radians = numpy.arccos(numpy.dot(u, v) / (numpy.linalg.norm(u) * numpy.linalg.norm(v)))
                     angle_degrees = math.degrees(angle_radians)
-                    polyngles.append(angle_degrees)
-                angles.append(polyngles)
+                    polyangles.append(angle_degrees)
+                angles.append(polyangles)
 
-        except IndexError:
+        except (scipy.spatial._qhull.QhullError, IndexError, ZeroDivisionError):
             angles_and_edges_error = True
             pass
 
@@ -979,7 +1028,7 @@ def export_data(hitlist, databasepath, reload=False, images=False):
     failedlist = []
     databaselocation = databasepath + "\\" + "database.txt"
     header_line = ("CSD Code\tChemical Formula\tMoiety Formula\tOrganic Components\tDiagram\tYear\tDOI\t"
-                  "Structure Description\tT\tC\tE\tF\tAdjacency\tB cation(s)\tX anion(s)\tMetal Coordination\t"
+                  "Structure Description\tT\tC\tE\tF\tAdjacency\tB cation(s)\tX anion(s)\tCoordination\t"
                    "Metal Charge\tC/P\tColor\tDescription\tSpace Group\tR Factor\tDiff. Temp\tCell Lengths [a,b,c]\t"
                   "Cell Angles [alpha, beta, gamma]\tZ\tDensity\tBond Distances\tTilting Angles\tDI: XT\tDI: XTX\t"
                   "DI:XX\tFlag\tNotes\n")
@@ -1004,6 +1053,7 @@ def export_data(hitlist, databasepath, reload=False, images=False):
         outputfile.close()
 
     for hit_number, hit in enumerate(hitlist):
+        skip_outer = False
         if hit.entry.identifier in skiplist:
             continue
         else:
@@ -1013,6 +1063,11 @@ def export_data(hitlist, databasepath, reload=False, images=False):
                 flag = ""
                 notes = []
 
+                for name in hit.entry.chemical_name.split(" "):
+                    if 'cyclopentadienyl' in name:
+                        skip_outer = True
+                if skip_outer:
+                    continue
                 if hit.entry.chemical_name:
                     organics = sanitize_name(hit.entry.chemical_name)
                 else:
@@ -1095,7 +1150,10 @@ def export_data(hitlist, databasepath, reload=False, images=False):
                 fiveplus_metals = False
                 for metal in metals:
                     if metal_charge != "N/F":
-                        if metal in ['Sn', 'Ge']:
+                        if metal == 'Pb':
+                            if not numpy.isclose(metal_charge, 2, atol=0.001):
+                                metal_charge = "N/F"
+                        elif metal in ['Sn', 'Ge']:
                             fourplus_metals = True
                             if (not numpy.isclose(metal_charge, 2, atol=0.001)
                                     and not numpy.isclose(metal_charge, 4, atol=0.001)):
@@ -1113,18 +1171,22 @@ def export_data(hitlist, databasepath, reload=False, images=False):
                 find_metal_oxidation_states_time = time.perf_counter()
                 timedict['find_metal_oxidation_states'] += find_metal_oxidation_states_time - perovskite_time
 
-                if fourplus_metals and metal_charge == 4:
+                if isinstance(metal_charge, str):
+                    hit_perovskite.identify_polyhedra()
+                elif fourplus_metals and numpy.isclose(metal_charge, 4, atol=0.001):
                         hit_perovskite.identify_polyhedra(oxidized_metal=True)
-                elif fiveplus_metals and metal_charge == 5:
+                elif fiveplus_metals and numpy.isclose(metal_charge, 5, atol=0.001):
                         hit_perovskite.identify_polyhedra(oxidized_metal=True)
                 else:
                     hit_perovskite.identify_polyhedra()
                 identify_polyhedra_time = time.perf_counter()
                 timedict['identify_polyhedra'] += identify_polyhedra_time - find_metal_oxidation_states_time
 
-                if fourplus_metals and metal_charge == 4:
+                if isinstance(metal_charge, str):
+                    hit_perovskite.calc_dimensionality()
+                elif fourplus_metals and numpy.isclose(metal_charge, 4, atol=0.001):
                     hit_perovskite.calc_dimensionality(oxidized_metal=True)
-                elif fiveplus_metals and metal_charge == 5:
+                elif fiveplus_metals and numpy.isclose(metal_charge, 5, atol=0.001):
                     hit_perovskite.calc_dimensionality(oxidized_metal=True)
                 else:
                     hit_perovskite.calc_dimensionality()
@@ -1164,7 +1226,7 @@ def export_data(hitlist, databasepath, reload=False, images=False):
                         adjacency = numpy.round(hit_perovskite.adjacency, decimals=4)
                     b_cations = hit_perovskite.b
                     x_anions = hit_perovskite.x
-                    coordination_numbers = hit_perovskite.coordination_numbers.sort(reverse=True)
+                    coordination_numbers = hit_perovskite.coordination_numbers
                     if hit_perovskite.cpp:
                         cpp = numpy.round(hit_perovskite.cpp, decimals=4)
                     else:
@@ -1190,17 +1252,18 @@ def export_data(hitlist, databasepath, reload=False, images=False):
                         tilting_list = hit_perovskite.tilting_angles
                         tilting_angles = numpy.round([numpy.min(tilting_list), numpy.max(tilting_list),
                                                       numpy.average(tilting_list), nmad(tilting_list)], decimals=3)
+                        tilting_angles[3] *= 100
 
                     dilist = hit_perovskite.distortion_indices
-                    di_xt = numpy.round([min(dilist[0]), max(dilist[0]), numpy.average(dilist[0]), nmad(dilist[0])],
+                    di_xt = 100*numpy.round([min(dilist[0]), max(dilist[0]), numpy.average(dilist[0]), nmad(dilist[0])],
                                         decimals=3)
                     if hit_perovskite.non_octahedral:
                         di_xx = 'N/A'
                         di_xtx = 'N/A'
                     else:
-                        di_xx = numpy.round([min(dilist[1]), max(dilist[1]), numpy.average(dilist[1]), nmad(dilist[1])],
+                        di_xx = 100*numpy.round([min(dilist[1]), max(dilist[1]), numpy.average(dilist[1]), nmad(dilist[1])],
                                             decimals=3)
-                        di_xtx = numpy.round(
+                        di_xtx = 100*numpy.round(
                             [min(dilist[2]), max(dilist[2]), numpy.average(dilist[2]), nmad(dilist[2])], decimals=3)
                 except (scipy.spatial._qhull.QhullError, IndexError, ZeroDivisionError) as error:
                     notes.append(f"Convex Hull Error")
@@ -1222,8 +1285,25 @@ def export_data(hitlist, databasepath, reload=False, images=False):
                         cpp = numpy.round(hit_perovskite.cpp, decimals=4)
                     else:
                         cpp = "N/F"
-                    bond_distances = "N/F"
-                    di_xt = "N/F"
+                    distances_list = hit_perovskite.distances_and_angles[0]
+                    distances_list = [item for sublist in distances_list for item in sublist]
+                    bond_distances = numpy.round([numpy.min(distances_list), numpy.max(distances_list),
+                                                  numpy.average(distances_list), nmad(distances_list)], decimals=3)
+                    # Scale nmad by 100 so it can be a percentage
+                    bond_distances[3] *= 100
+                    if numpy.max(distances_list) > 4.5:
+                        flag = 'red'
+                        notes.append(f"Very long B...X bond: {numpy.round(numpy.max(distances_list), decimals=3)}")
+                    elif numpy.max(distances_list) > 4.0:
+                        if flag != 'red':
+                            flag = 'orange'
+                        notes.append(f"Long B...X bond: {numpy.round(numpy.max(distances_list), decimals=3)}")
+                    elif numpy.max(distances_list) > 3.5:
+                        if flag != 'red' and flag != 'orange':
+                            flag = 'yellow'
+                        notes.append(f"Slightly long B...X bond: {numpy.round(numpy.max(distances_list), decimals=3)}")
+                    di_xt = 100*numpy.round([min(dilist[0]), max(dilist[0]), numpy.average(dilist[0]), nmad(dilist[0])],
+                                        decimals=3)
                     di_xx = "N/F"
                     di_xtx = "N/F"
 
@@ -1301,4 +1381,7 @@ def process(hit_or_filepath):
     print(f"Structure Description: {perov.description}")
     print(f"Coordination Numbers: {perov.coordination_numbers}")
     print(f"Connectivity Indices: {numpy.round(perov.normalized_connectivity_indices, 4)}")
-    print(f"Adjacency: {numpy.round(perov.adjacency, 4)}")
+    if perov.adjacency:
+        print(f"Adjacency: {numpy.round(perov.adjacency, 4)}")
+    else:
+        print("Adjacency: N/A")

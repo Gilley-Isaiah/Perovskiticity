@@ -82,7 +82,7 @@ def citation_machine(database_path,
         for forbiddencharacter in ["\\", r"/", ":", "*", "?", '"', "<", ">", "|", "\\\\", r"\\"]:
             doistring = doistring.replace(forbiddencharacter, "")
         doistring = doistring + ".ris"
-        if doistring not in prior_citations:
+        if doistring.lower() not in prior_citations:
             citation(doi, directory=citation_directory)
             time.sleep(3)
         elif doistring in prior_citations:
