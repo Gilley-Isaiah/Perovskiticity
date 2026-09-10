@@ -206,26 +206,6 @@ def nmad(inputlist):
         nmad_value = numpy.average(devlist) / average
     return nmad_value
 
-def xgcd(a, b):
-    """The xcd() function is an implementation of the extended Euclidean algorithm for quickly finding the
-    greatest common denominator between two numbers.
-
-
-    :param a: A number
-    :param b: A number
-    :return: The greatest common demoninator between the two numbers
-    """
-    if a < b:
-        a, b = b, a
-    u_i, u_j = 0, 1
-    v_i, v_j = 1, 0
-    while a % b != 0:
-        div = a // b
-        a, b = b, a % b
-        u_i, u_j = u_j, u_i - div * u_j
-        v_i, v_j = v_j, v_i - div * v_j
-    return b
-
 class Perovskite:
     """Perovskite class (borrowed from Pyrovskite) will be used to do structure calculations."""
 
