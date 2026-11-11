@@ -231,7 +231,7 @@ class Perovskite:
 
         :param structure: A Pymatgen structure object.
         :param a: A list of elemental symbols (as strings) for A cations. These will be identified if they
-        are not provided.
+        are not provided. These elements are ignored (as are any elements not identified as B cations or X anions).
         :param b: A list of elemental symbols (as strings) for B cations. These will be identified if they
         are not provided.
         :param x: A list of elemental symbols (as strings) for X anions. These will be identified if they
@@ -346,19 +346,18 @@ class Perovskite:
         Perovskite.identify_polyhedra()) and calculates the centers (B cations) and vertices (X anions) of
         each polyhedron within the structure.
 
-        Note that return_distances is deprecated. See the distances() and angles() function.
-
-        In the future, this function may be used to assess disordered strutures by including site
-        occupancies in the calculation.
+        In the future, this function may be used to assess disordered strutures by including site occupancies in the
+        calculation.
 
         :param self: A Perovskite object.
         :param oxidized_metal: A boolean specifying whether the metal site is oxidized relative to its assumed
                                 oxidation state (e.g. Sn4+ instead of Sn2+)
 
-        :return: A list of lists of triples, where each interior list designates a polyhedron, the first
-        triple is the coordinates of the B cation, and the following triples are the coordinates of X
-        anions. Note that the triples take the form [a, b, c], where a, b, and c are coordinates (in
-        either fractional or Cartesian form, depending on the value of frac).
+        :return: Returns nothing but sets several properties of the Perovskite, most notably the self.polyhedra and
+        self.frac_polyhedra properties, each of which contains a list of lists of triples, where each interior
+        list designates a polyhedron, the first triple is the coordinates of the B cation, and the following triples
+        are the coordinates of X anions. Note that the triples take the form [a, b, c], where a, b, and c are coordinates
+        (in Cartesian or fractional form for self.polyhedra and self.frac_polyhedra, respectively).
         """
         b = self.b
         x = self.x
@@ -763,7 +762,7 @@ class Perovskite:
         self.distortion_indices = [dixt_list, dixtx_list, dixx_list]
 
     def calc_dimensionality(self):
-        """The calc_dimensionality function calculates the covalent (bonding)vdimensionality of a structure, using a
+        """The calc_dimensionality function calculates the covalent (bonding) dimensionality of a structure, using a
             method described by Larsen as implemented in Pymatgen's get_dimensionality_larsen() function.
 
             Will not work properly unless Perovskite.identify_polyhedra() has been called FIRST and succeeded normally.
