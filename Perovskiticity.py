@@ -24,6 +24,7 @@ import math
 import numpy
 import scipy.spatial._qhull
 from scipy.spatial import ConvexHull
+import itertools
 from pymatgen.core import Lattice, Structure
 from pymatgen.analysis.dimensionality import get_dimensionality_larsen
 from pymatgen.analysis.local_env import JmolNN
@@ -76,16 +77,21 @@ jmol_radii_ionic = {'H-': 1.54, 'Li+': 0.68, 'Be+': 0.44, 'Be2+': 0.35, 'B+': 0.
                     'Ac3+': 1.18, 'Th4+': 1.02, 'Pa3+': 1.13, 'Pa4+': 0.98, 'Pa5+': 0.89, 'U4+': 0.97, 'U6+': 0.8,
                     'Np3+': 1.1, 'Np4+': 0.95, 'Np7+': 0.71, 'Pu3+': 1.08, 'Pu4+': 0.93, 'Am3+': 1.07, 'Am4+': 0.92}
 
-
 # Special exceptions to jmol_radii
-bond_lengths =         {'Ge': 3.44, 'Sn': 3.44, 'Pb': 3.05,
-                        'Ag': 2.90, 'In': 2.62, 'Tl': 3.51, 'As': 2.34, 'Sb': 2.57, 'Bi': 2.91,
-                        'F': 0.5, 'Cl': 0.8, 'Br': 0.95, 'I': 1.25}
+# Assumed oxidation states: Ge2+, Sn2+, Pb2+, Ag+, In3+, Tl+, As3+, Sb3+, Bi3+, F-, Cl-, Br-, I-
+shannon_ionic_radii = {'Ge': 0.73, 'Sn': 1.02, 'Pb': 1.19,
+                       'Ag': 1.15, 'In':0.80, 'Tl':1.50, 'As':0.58, 'Sb':0.76, 'Bi':1.03,
+                       'F':1.33, 'Cl':1.81, 'Br':1.96, 'I':2.20}
 
-# Assumption: Pb, Ag, In, Tl will never be outside of their usual oxidation state (+2, +1, +3, +1, respectively)
-bond_lengths_oxidized = {'Ge': 1.5, 'Sn': 1.85, 'Pb':3.05,
-                         'Ag': 2.90, 'In':2.62, 'Tl':3.51, 'As':1.65, 'Sb':1.65, 'Bi':1.75,
-                         'F':0.5, 'Cl':0.8, 'Br':0.95, 'I':1.25}
+# Assumed oxidation states: Ge4+, Sn4+, Pb2+, Ag+, In3+, Tl3+, As5+, Sb5+, Bi5+, F-, Cl-, Br-, I-
+# Assumption: Pb, Ag, and In will never be oxidized beyond +2, +1, and +3, respetively
+shannon_ionic_radii_oxidized = {'Ge': 0.53, 'Sn': 0.69, 'Pb': 1.19,
+                                'Ag': 1.15, 'In':0.80, 'Tl':0.885, 'As':0.46, 'Sb':0.6, 'Bi':0.76,
+                                'F':1.33, 'Cl':1.81, 'Br':1.96, 'I':2.20}
+
+shannon_radius_sum_multiplier_exceptions = {'Ge': 1.5, 'Sn': 1.5, 'As':1.5, 'Sb':1.5}
+
+global_structure_radius_multiplier = 1.3
 
 
 def find_metal_oxidation_states(hit):
@@ -148,6 +154,13 @@ def find_metal_oxidation_states(hit):
         metal_charge = (halide_count + total_inorganic_charge) / metal_count
 
     return metal_charge
+
+def remove_organics(hit):
+    crystal = hit.entry.crystal
+    crystal.remove_hydrogens()
+    keep_elements = ['Ge', 'Sn', 'Pb', 'Ag', 'In', 'Tl', 'As', 'Sb', 'Bi', 'F', 'Cl', 'Br', 'I']
+    crystal.molecule.remove_atoms(atom for atom in crystal.molecule.atoms if atom.atomic_symbol not in keep_elements)
+    return crystal
 
 def pymatgenize(hit):
     """The pymatgenize function turns a ccdc hit object into a Pymatgen Structure object which the below
@@ -235,7 +248,10 @@ class Perovskite:
         self.b = b
         self.x = x
         self.n = n
+        self.disordered_inorganics = set()
         self.structure_radius = None
+        self.structure_radius_multiplier = None
+        self.preferred_radii = None
         self.polyhedra = None
         self.frac_polyhedra = None
         self.cpp = None
@@ -363,49 +379,65 @@ class Perovskite:
 
         removeset = set()
         site_splitting = set()
+        occupancy_splitting = set()
         for site in simplestructure.sites:
             if site.species_string in self.b:
                 if site not in removeset:
-                    for neighbor in simplestructure.get_neighbors(site, 1.9):
+                    for neighbor in simplestructure.get_neighbors(site, 0.001):
+                        if neighbor.species_string in self.b:
+                            removeset.add(simplestructure.sites[neighbor.index])
+                            occupancy_splitting.add(site.species_string)
+                    for neighbor in simplestructure.get_neighbors_in_shell(site.coords, 0.95, 0.949):
                         if neighbor.species_string in self.b:
                             removeset.add(simplestructure.sites[neighbor.index])
                             site_splitting.add(site.species_string)
             if site.species_string in self.x:
                 if site not in removeset:
-                    for neighbor in simplestructure.get_neighbors(site, 1.9):
+                    for neighbor in simplestructure.get_neighbors(site, 0.001):
+                        if neighbor.species_string in self.x:
+                            removeset.add(simplestructure.sites[neighbor.index])
+                            occupancy_splitting.add(site.species_string)
+                    for neighbor in simplestructure.get_neighbors_in_shell(site.coords, 0.95, 0.949):
                         if neighbor.species_string in self.x:
                             removeset.add(simplestructure.sites[neighbor.index])
                             site_splitting.add(site.species_string)
         for site in removeset:
             simplestructure.remove(site)
         self.simplestructure = simplestructure
+        self.disordered_inorganics = site_splitting
 
 
         # This block defines special radii used for the program.
+        self.structure_radius_multiplier = global_structure_radius_multiplier
         if oxidized_metal:
-            atomic_radii_updates = bond_lengths_oxidized
+            atomic_radii_updates = shannon_ionic_radii_oxidized
+            self.structure_radius_multiplier = global_structure_radius_multiplier
         else:
-            atomic_radii_updates = bond_lengths
+            atomic_radii_updates = shannon_ionic_radii
+            for metal in self.b:
+                if metal in shannon_radius_sum_multiplier_exceptions.keys():
+                    if shannon_radius_sum_multiplier_exceptions[metal] > self.structure_radius_multiplier:
+                        self.structure_radius_multiplier = shannon_radius_sum_multiplier_exceptions[metal]
         if all("+" in metal for metal in b):
             ionic_radii = True
         else:
             ionic_radii = False
         if ionic_radii:
-            preferred_radii = jmol_radii_ionic
+            self.preferred_radii = jmol_radii_ionic
         else:
-            preferred_radii = jmol_radii | atomic_radii_updates
+            self.preferred_radii = jmol_radii | atomic_radii_updates
 
         # This block uses the preferred radii to generate an assumed maximum radius for the structure
         blist = []
         xlist = []
         for metal in b:
-            blist.append(preferred_radii[metal])
+            blist.append(self.preferred_radii[metal])
         for anion in x:
-            xlist.append(preferred_radii[anion])
+            xlist.append(self.preferred_radii[anion])
         if ionic_radii:
-            self.structure_radius = (max(blist) + max(xlist)) * 1.2
+            self.structure_radius = (max(blist) + max(xlist)) * self.structure_radius_multiplier
         elif not ionic_radii:
-            self.structure_radius = max(blist) + max(xlist)
+            self.structure_radius = (max(blist) + max(xlist)) * self.structure_radius_multiplier
 
         # We begin by appending the coordinates of each B cation to the polyhedra list.
         polyhedra_ct = 0
@@ -452,7 +484,7 @@ class Perovskite:
         # This block calculates the average charge per polyhedron (C/P) for the structure. It ignores structures with
         # multiple differently charged cations.
         charges =          {'Pb':2, 'Sn':2, 'Ge':2, 'As':3, 'Sb':3, 'Bi':3, 'Ag':1, 'In':3, 'Tl':1}
-        oxidized_charges = {'Pb':2, 'Sn':4, 'Ge':4, 'As':5, 'Sb':5, 'Bi':5, 'Ag':1, 'In':3, 'Tl':1}
+        oxidized_charges = {'Pb':2, 'Sn':4, 'Ge':4, 'As':5, 'Sb':5, 'Bi':5, 'Ag':1, 'In':3, 'Tl':3}
         try:
             if oxidized_metal:
                 structurecharges = {oxidized_charges[x] for x in self.b}
@@ -730,23 +762,18 @@ class Perovskite:
                 dixtx_list.append(nmad(polyhedron))
         self.distortion_indices = [dixt_list, dixtx_list, dixx_list]
 
-    def calc_dimensionality(self, oxidized_metal = False):
+    def calc_dimensionality(self):
         """The calc_dimensionality function calculates the covalent (bonding)vdimensionality of a structure, using a
             method described by Larsen as implemented in Pymatgen's get_dimensionality_larsen() function.
 
             Will not work properly unless Perovskite.identify_polyhedra() has been called FIRST and succeeded normally.
 
             :param self: A Perovskite object.
-            :param oxidized_metal: A boolean specifying whether the metal site is oxidized relative to its assumed
-                                oxidation state (e.g. Sn4+ instead of Sn2+)
             :return: No return, but builds the property Perovskite.dimensionality, which is an
             integer representing the covalent dimensionality.
             """
         simplestructure = self.simplestructure
-        if oxidized_metal:
-            jmol_update = bond_lengths_oxidized
-        else:
-            jmol_update = bond_lengths
+        jmol_update = {element: (radius * self.structure_radius_multiplier) for element, radius in self.preferred_radii.items()}
         bonded_structure = JmolNN(el_radius_updates=jmol_update, tol=0.0).get_bonded_structure(simplestructure)
         # Remove 'bonds' between x anions or between b cations
         edges_to_be_removed = []
@@ -948,18 +975,18 @@ def execute_search(metals = 'Group14'):
                                                  'Ag', 'Au', 'Zn', 'Cd', 'Hg', 'Al', 'Ga', 'In', 'Tl', 'As', 'Sb', 'Bi',
                                                  'Te', 'Po', 'Ce', 'Th', 'Pr', 'Pa', 'Nd', 'U', 'Pm', 'Np', 'Sm', 'Pu',
                                                  'Eu', 'Am', 'Gd', 'Cm', 'Tb', 'Bk', 'Dy', 'Cf', 'Ho', 'Es', 'Er', 'Fm',
-                                                 'Tm', 'Md', 'Yb', 'No', 'Lr'])
+                                                 'Tm', 'Md', 'Yb', 'No', 'Lu', 'Lr'])
     elif metals == 'Group13+15':
         metals1 = ccdc.search.QueryAtom(['Bi', 'Sb', 'As', 'Tl', 'In'])
         metals2 = ccdc.search.QueryAtom(['Bi', 'Sb', 'As', 'Tl', 'In'])
         halides = ccdc.search.QueryAtom(['F', 'Cl', 'Br', 'I'])
         forbidden_partners = ccdc.search.QueryAtom(['B', 'N', 'C', 'O', 'S', 'P', 'Se', 'Si'])
-        forbidden_atoms = ccdc.search.QueryAtom(['Be', 'Mg', 'Ca', 'Sr', 'Ba', 'Ra', 'Sc', 'Y', 'La', 'Ac', 'Ti', 'Zr',
-                                                  'Hf', 'Ta', 'W', 'Mn', 'Tc', 'Re', 'Fe', 'Ru', 'Os', 'Co', 'Rh', 'Ir',
-                                                  'Ni', 'Pd', 'Pt', 'Cu', 'Au', 'Zn', 'Cd', 'Hg', 'Al', 'Ga', 'Ce', 'Pr',
-                                                  'Nd', 'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er', 'Tm','Yb', 'Lu',
-                                                  'Th', 'Pa', 'U', 'Np', 'Pu', 'Am', 'Cm', 'Bk', 'Cf', 'Es', 'Fm', 'Md',
-                                                  'No', 'Lr', 'Li', 'Na', 'K', 'Fr'])
+        forbidden_atoms = ccdc.search.QueryAtom([ 'Li', 'Na', 'K', 'Fr', 'Be', 'Mg', 'Ca', 'Sr', 'Ba', 'Ra', 'Sc', 'Y',
+                                                  'La', 'Ac', 'Ti', 'Zr', 'Hf', 'V', 'Nb', 'Ta', 'Cr', 'Mo', 'W', 'Mn',
+                                                  'Tc', 'Re', 'Fe', 'Ru', 'Os', 'Co', 'Rh', 'Ir', 'Ni', 'Pd', 'Pt', 'Cu',
+                                                  'Au', 'Zn', 'Cd', 'Hg', 'Al', 'Ga', 'Te', 'Po', 'Ce', 'Pr', 'Nd', 'Pm',
+                                                  'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er', 'Tm','Yb', 'Lu', 'Th', 'Pa',
+                                                  'U', 'Np', 'Pu', 'Am', 'Cm', 'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr'])
     # Make a bond query (can be included or excluded later, checks for anything with a bond from first group to second group)
     bonds_query1 = ccdc.search.QueryBond('Single')
     allowed_query = ccdc.search.QuerySubstructure()
@@ -1004,7 +1031,7 @@ def export_data(hitlist, databasepath, reload=False, images=False):
                 'identify_polyhedra':0,'connectivity':0, 'calc_adjacency':0, 'calc_distances_and_angles':0,
                 'calc_distortion_indices':0,'calc_dimensionality':0, 'describe_structure':0, 'wrapping up':0}
     bigdatalist = []
-    skiplist = ['AVOSEK']
+    skiplist = ['AVOSEK', 'VOYFIC', 'ZESDIN', 'ELIKAP', 'ELIJUI']
     failedlist = []
     databaselocation = databasepath + "\\" + "database.txt"
     header_line = ("CSD Code\tChemical Formula\tMoiety Formula\tOrganic Components\tDiagram\tYear\tDOI\t"
@@ -1128,6 +1155,7 @@ def export_data(hitlist, databasepath, reload=False, images=False):
                         metal_charge = 1
                 fourplus_metals = False
                 fiveplus_metals = False
+                thallium = False
                 for metal in metals:
                     if metal_charge != "N/F":
                         if metal == 'Pb':
@@ -1143,7 +1171,12 @@ def export_data(hitlist, databasepath, reload=False, images=False):
                             if (not numpy.isclose(metal_charge, 3, atol=0.001)
                                     and not numpy.isclose(metal_charge, 5, atol=0.001)):
                                 metal_charge = "N/F"
-                        elif metal in ['Ag', 'In', 'Tl']:
+                        elif metal == 'Tl':
+                            thallium = True
+                            if (not numpy.isclose(metal_charge, 1, atol=0.001)
+                                    and not numpy.isclose(metal_charge, 3, atol=0.001)):
+                                metal_charge = "N/F"
+                        elif metal in ['Ag', 'In']:
                             if (not numpy.isclose(metal_charge, 1, atol=0.001)
                                     and not numpy.isclose(metal_charge, 3, atol=0.001)):
                                 metal_charge = "N/F"
@@ -1157,19 +1190,20 @@ def export_data(hitlist, databasepath, reload=False, images=False):
                         hit_perovskite.identify_polyhedra(oxidized_metal=True)
                 elif fiveplus_metals and numpy.isclose(metal_charge, 5, atol=0.001):
                         hit_perovskite.identify_polyhedra(oxidized_metal=True)
+                elif thallium and numpy.isclose(metal_charge, 3, atol=0.001):
+                    hit_perovskite.identify_polyhedra(oxidized_metal=True)
                 else:
                     hit_perovskite.identify_polyhedra()
+
+                if hit_perovskite.disordered_inorganics:
+                    if flag != "red":
+                        flag = "orange"
+                    notes.append(f"Site splitting: {', '.join(hit_perovskite.disordered_inorganics)}")
+
                 identify_polyhedra_time = time.perf_counter()
                 timedict['identify_polyhedra'] += identify_polyhedra_time - find_metal_oxidation_states_time
 
-                if isinstance(metal_charge, str):
-                    hit_perovskite.calc_dimensionality()
-                elif fourplus_metals and numpy.isclose(metal_charge, 4, atol=0.001):
-                    hit_perovskite.calc_dimensionality(oxidized_metal=True)
-                elif fiveplus_metals and numpy.isclose(metal_charge, 5, atol=0.001):
-                    hit_perovskite.calc_dimensionality(oxidized_metal=True)
-                else:
-                    hit_perovskite.calc_dimensionality()
+                hit_perovskite.calc_dimensionality()
                 calc_dimensionality_time = time.perf_counter()
                 timedict['calc_dimensionality'] += calc_dimensionality_time - identify_polyhedra_time
 
@@ -1213,20 +1247,36 @@ def export_data(hitlist, databasepath, reload=False, images=False):
                         cpp = 'N/A'
 
                     distances_list = hit_perovskite.distances_and_angles[0]
-                    distances_list = [item for sublist in distances_list for item in sublist]
+                    distances_list = list(itertools.chain.from_iterable(distances_list))
                     bond_distances = numpy.round([numpy.min(distances_list), numpy.max(distances_list),
                                                   numpy.average(distances_list), nmad(distances_list)], decimals=3)
-                    if numpy.max(distances_list) > 4.5:
+
+                    longest_cation_shannon_radius = max(hit_perovskite.preferred_radii[cation] for cation in hit_perovskite.b)
+                    longest_anion_shannon_radius = max(hit_perovskite.preferred_radii[anion] for anion in hit_perovskite.x)
+                    reference_longest_shannon_radius_sum = longest_anion_shannon_radius + longest_cation_shannon_radius
+                    if numpy.max(distances_list) > 1.4 * reference_longest_shannon_radius_sum:
                         flag = 'red'
                         notes.append(f"Very long B...X bond: {numpy.round(numpy.max(distances_list), decimals=3)}")
-                    elif numpy.max(distances_list) > 4.0:
+                    elif numpy.max(distances_list) > 1.3 * reference_longest_shannon_radius_sum:
                         if flag != 'red':
                             flag = 'orange'
                         notes.append(f"Long B...X bond: {numpy.round(numpy.max(distances_list), decimals=3)}")
-                    elif numpy.max(distances_list) > 3.5:
+                    elif numpy.max(distances_list) > 1.2 * reference_longest_shannon_radius_sum:
                         if flag != 'red' and flag != 'orange':
                             flag = 'yellow'
                         notes.append(f"Slightly long B...X bond: {numpy.round(numpy.max(distances_list), decimals=3)}")
+
+                    shortest_cation_shannon_radius = min(hit_perovskite.preferred_radii[cation] for cation in hit_perovskite.b)
+                    shortest_anion_shannon_radius = min(hit_perovskite.preferred_radii[anion] for anion in hit_perovskite.x)
+                    reference_shortest_shannon_radius_sum = shortest_anion_shannon_radius + shortest_cation_shannon_radius
+                    if numpy.min(distances_list) < 0.7 * reference_shortest_shannon_radius_sum:
+                        flag = 'red'
+                        notes.append(f"Very short B...X bond: {numpy.round(numpy.min(distances_list), decimals=3)}")
+                    elif numpy.min(distances_list) < 0.8 * reference_shortest_shannon_radius_sum:
+                        if flag != 'red':
+                            flag = 'orange'
+                        notes.append(f"Short B...X bond: {numpy.round(numpy.min(distances_list), decimals=3)}")
+
 
                     if hit_perovskite.tilting_angles:
                         tilting_list = hit_perovskite.tilting_angles
@@ -1249,7 +1299,8 @@ def export_data(hitlist, databasepath, reload=False, images=False):
                     notes.append(f"Convex Hull Error")
                     if flag != "red":
                         flag = "orange"
-                    print(f"Qhull Error for {hit.identifier}, error {error}.")
+                    reduced_error = error.split("\n")[0]
+                    print(f"Qhull Error for {hit.identifier}, error {reduced_error}.")
                     hit_perovskite.describe_structure()
 
                     description = hit_perovskite.description
@@ -1271,17 +1322,34 @@ def export_data(hitlist, databasepath, reload=False, images=False):
                                                   numpy.average(distances_list), nmad(distances_list)], decimals=3)
                     # Scale nmad by 100 so it can be a percentage
                     bond_distances[3] *= 100
-                    if numpy.max(distances_list) > 4.5:
+
+                    longest_cation_shannon_radius = max(hit_perovskite.preferred_radii[cation] for cation in hit_perovskite.b)
+                    longest_anion_shannon_radius = max(hit_perovskite.preferred_radii[anion] for anion in hit_perovskite.x)
+                    reference_longest_shannon_radius_sum = longest_anion_shannon_radius + longest_cation_shannon_radius
+                    if numpy.max(distances_list) > 1.4 * reference_longest_shannon_radius_sum:
                         flag = 'red'
                         notes.append(f"Very long B...X bond: {numpy.round(numpy.max(distances_list), decimals=3)}")
-                    elif numpy.max(distances_list) > 4.0:
+                    elif numpy.max(distances_list) > 1.3 * reference_longest_shannon_radius_sum:
                         if flag != 'red':
                             flag = 'orange'
                         notes.append(f"Long B...X bond: {numpy.round(numpy.max(distances_list), decimals=3)}")
-                    elif numpy.max(distances_list) > 3.5:
+                    elif numpy.max(distances_list) > 1.2 * reference_longest_shannon_radius_sum:
                         if flag != 'red' and flag != 'orange':
                             flag = 'yellow'
                         notes.append(f"Slightly long B...X bond: {numpy.round(numpy.max(distances_list), decimals=3)}")
+
+                    shortest_cation_shannon_radius = min(hit_perovskite.preferred_radii[cation] for cation in hit_perovskite.b)
+                    shortest_anion_shannon_radius = min(hit_perovskite.preferred_radii[anion] for anion in hit_perovskite.x)
+                    reference_shortest_shannon_radius_sum = shortest_anion_shannon_radius + shortest_cation_shannon_radius
+                    if numpy.min(distances_list) < 0.7 * reference_shortest_shannon_radius_sum:
+                        flag = 'red'
+                        notes.append(f"Very short B...X bond: {numpy.round(numpy.min(distances_list), decimals=3)}")
+                    elif numpy.min(distances_list) < 0.8 * reference_shortest_shannon_radius_sum:
+                        if flag != 'red':
+                            flag = 'orange'
+                        notes.append(f"Short B...X bond: {numpy.round(numpy.min(distances_list), decimals=3)}")
+
+                    dilist = hit_perovskite.distortion_indices
                     di_xt = 100*numpy.round([min(dilist[0]), max(dilist[0]), numpy.average(dilist[0]), nmad(dilist[0])],
                                         decimals=3)
                     di_xx = "N/F"
